@@ -1,0 +1,585 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Yanie ♡</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  color: white;
+  font-family: Georgia, serif;
+  background:
+    radial-gradient(circle at 20% 15%, #bda0e8, transparent 35%),
+    radial-gradient(circle at 85% 85%, #8d69bd, transparent 32%),
+    linear-gradient(135deg, #4a326b, #8e6bb9, #60417e);
+}
+
+.card {
+  width: min(760px, 100%);
+  padding: clamp(22px, 5vw, 45px);
+  text-align: center;
+  background: #352347e8;
+  border: 1px solid #ffffff50;
+  border-radius: 25px;
+  box-shadow: 0 20px 60px #170c2c66;
+}
+
+.hidden { display: none !important; }
+
+.eyebrow {
+  color: #e5d2ff;
+  font: 11px Arial, sans-serif;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: clamp(32px, 6vw, 52px);
+  font-weight: normal;
+  line-height: 1.15;
+  margin: 0 0 20px;
+}
+
+h2 {
+  font-size: clamp(25px, 4vw, 35px);
+  font-weight: normal;
+  line-height: 1.2;
+}
+
+p {
+  font-size: clamp(16px, 2.4vw, 19px);
+  line-height: 1.8;
+}
+
+.small {
+  font: 13px/1.7 Arial, sans-serif;
+  color: #e7d9f8;
+}
+
+.heart {
+  font-size: 34px;
+  color: #f3dfff;
+  margin-bottom: 12px;
+}
+
+button {
+  padding: 13px 25px;
+  margin: 8px 4px;
+  border: 1px solid #ffffff99;
+  border-radius: 50px;
+  background: #eee0ff;
+  color: #50356e;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: white;
+  transform: translateY(-1px);
+}
+
+.progress {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin-bottom: 22px;
+}
+
+.dot {
+  width: 32px;
+  height: 6px;
+  border-radius: 10px;
+  background: #ffffff30;
+}
+
+.dot.active { background: #f0ddff; }
+
+.puzzle-wrap {
+  width: min(420px, 100%);
+  margin: 20px auto;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 5px;
+  border-radius: 12px;
+  background: #eadbfb;
+  aspect-ratio: 1;
+}
+
+.slot {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  background: #ffffff30;
+  border: 1px dashed #ffffff70;
+}
+
+.slot.selected {
+  outline: 3px solid white;
+  outline-offset: -3px;
+}
+
+.tile {
+  width: 100%;
+  height: 100%;
+  display: block;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 3px;
+  background-repeat: no-repeat;
+  cursor: grab;
+  touch-action: manipulation;
+}
+
+.message {
+  text-align: left;
+  padding: 20px;
+  border-left: 2px solid #e5cfff;
+  background: #ffffff0b;
+  border-radius: 0 14px 14px 0;
+}
+
+.message p { margin: 0 0 16px; }
+.message p:last-child { margin-bottom: 0; }
+
+.feedback {
+  min-height: 24px;
+  font: 13px Arial, sans-serif;
+  color: #f4e7ff;
+  margin: 10px 0;
+}
+
+.signature {
+  margin-top: 24px;
+  color: #ead9ff;
+  font-size: 19px;
+  font-style: italic;
+}
+
+@media(max-width: 440px) {
+  .card { padding: 24px 16px; }
+}
+</style>
+</head>
+
+<body>
+<main class="card">
+
+<!-- ENTRY PAGE -->
+<section id="welcome">
+  <div class="heart">♡</div>
+  <div class="eyebrow">A little something for you</div>
+
+  <h1>We've only been talking for a couple of weeks…</h1>
+
+  <p>
+    Yet somehow, it feels like I've known you
+    my whole life, Yanie.
+  </p>
+
+  <p class="small">
+    Three memories, three little picture puzzles,
+    and one big thing I want you to know.
+  </p>
+
+  <button onclick="start()">▶ PLAY</button>
+</section>
+
+<!-- PUZZLE PAGE -->
+<section id="puzzle" class="hidden">
+  <div class="progress">
+    <span class="dot active" id="d0"></span>
+    <span class="dot" id="d1"></span>
+    <span class="dot" id="d2"></span>
+  </div>
+
+  <div class="eyebrow" id="label"></div>
+  <h2 id="question"></h2>
+
+  <p class="small">
+    Put the picture back together!
+    Tap one piece and then another to swap them.
+    You can also drag and drop pieces on a computer.
+  </p>
+
+  <div class="puzzle-wrap">
+    <div class="board" id="board"></div>
+  </div>
+
+  <div class="feedback" id="feedback">
+    Every piece has its place. ♡
+  </div>
+
+  <button onclick="shuffleBoard()">SHUFFLE</button>
+  <button onclick="checkBoard()">CHECK PUZZLE</button>
+</section>
+
+<!-- MEMORY MESSAGE PAGE -->
+<section id="memory" class="hidden">
+  <div class="heart">✧</div>
+  <div class="eyebrow" id="memoryLabel"></div>
+  <h2 id="memoryTitle"></h2>
+
+  <div class="message">
+    <p id="memoryText"></p>
+  </div>
+
+  <button onclick="nextMemory()">CONTINUE ♡</button>
+</section>
+
+<!-- FINAL PAGE -->
+<section id="ending" class="hidden">
+  <div class="heart">♡</div>
+  <div class="eyebrow">And, most importantly…</div>
+
+  <h1>I'm so thankful you're in my life, Yanie.</h1>
+
+  <div class="message">
+    <p>
+      It's honestly amazing how someone I've only known
+      for a little while can already mean so much to me.
+      You've brought a kind of comfort and happiness into
+      my life that I didn't even realize I needed.
+      You make ordinary moments feel special, and you
+      remind me that being understood, cared for, and
+      simply having someone to share things with can
+      make such a big difference.
+    </p>
+
+    <p>
+      You've changed me for the better, Yanie. You make
+      me want to be softer, more patient, more open, and
+      more intentional with the way I care for someone.
+      I'm thankful for every laugh, every conversation,
+      every memory we've started making, and even the
+      little moments that might seem ordinary to anyone
+      else but mean a lot to me because they're with you.
+    </p>
+
+    <p>
+      I hope you always remember that you don't have
+      to face everything alone. On the good days, the
+      hard days, the confusing days, and the days when
+      you don't feel like yourself, I'll be here to listen,
+      understand, encourage you, and remind you how
+      much you matter. You never have to pretend to be
+      okay with me.
+    </p>
+
+    <p>
+      I may not be able to give you the whole world,
+      but I'll keep trying to give you the care, patience,
+      reassurance, and love you deserve. Thank you for
+      being you, and thank you for letting me be part of
+      your life. Whatever comes our way, I'll keep
+      choosing to show up for you.
+    </p>
+  </div>
+
+  <div class="signature">Always in, always. ♡</div>
+</section>
+
+</main>
+
+<script>
+// ORIGINAL PICTURE ILLUSTRATIONS
+
+function svgImage(content) {
+  return "url('data:image/svg+xml;charset=UTF-8," +
+    encodeURIComponent(content) + "')";
+}
+
+const rainPicture = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+<defs>
+<linearGradient id="bg" x2="0" y2="1">
+<stop stop-color="#392c58"/>
+<stop offset="1" stop-color="#a58bd0"/>
+</linearGradient>
+</defs>
+<rect width="300" height="300" fill="url(#bg)"/>
+<circle cx="230" cy="46" r="23" fill="#f3e7ff"/>
+<path d="M0 200L60 110 110 190 165 100 230 200 270 140 300 190V300H0Z" fill="#4a3b68"/>
+<g stroke="#e7ddff" stroke-width="3">
+<path d="M30 0L18 28M80 40L68 68M140 15L128 43M195 65L183 93M265 20L253 48"/>
+<path d="M45 90L33 118M110 115L98 143M220 110L208 138M280 170L268 198"/>
+<path d="M65 165L53 193M155 175L143 203M205 215L193 243"/>
+</g>
+<path d="M75 153Q150 45 225 153Z" fill="#d9c4f4"/>
+<path d="M75 153Q150 70 225 153" fill="none" stroke="#fff" stroke-width="4"/>
+<path d="M150 153V221Q150 238 166 231" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+<circle cx="126" cy="180" r="9" fill="#f4e9ff"/>
+<circle cx="174" cy="180" r="9" fill="#f4e9ff"/>
+<path d="M110 213Q150 235 190 213" fill="none" stroke="#e9d9ff" stroke-width="8" stroke-linecap="round"/>
+<path d="M0 265Q70 250 140 270T300 264V300H0Z" fill="#c7aceb"/>
+<text x="150" y="285" text-anchor="middle" font-family="Georgia" font-size="13" fill="#fff">a rainy night together</text>
+</svg>`;
+
+const talkingPicture = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+<defs>
+<linearGradient id="bg" x2="0" y2="1">
+<stop stop-color="#392b57"/>
+<stop offset="1" stop-color="#b49bdc"/>
+</linearGradient>
+</defs>
+<rect width="300" height="300" fill="url(#bg)"/>
+<circle cx="42" cy="40" r="3" fill="#fff"/>
+<circle cx="252" cy="53" r="4" fill="#fff"/>
+<circle cx="216" cy="25" r="2" fill="#fff"/>
+<path d="M45 210Q150 170 255 210V300H45Z" fill="#59416f"/>
+<circle cx="105" cy="106" r="29" fill="#f0d7cb"/>
+<circle cx="195" cy="106" r="29" fill="#f0d7cb"/>
+<path d="M75 105Q75 55 107 64Q137 62 136 105L124 89 82 91Z" fill="#48324f"/>
+<path d="M164 103Q160 58 195 62Q229 61 226 105L213 83 177 85Z" fill="#48324f"/>
+<path d="M66 202Q62 139 105 137Q149 139 145 202Z" fill="#d8c0f3"/>
+<path d="M155 202Q151 139 195 137Q238 139 234 202Z" fill="#b69adf"/>
+<path d="M112 105q7 6 13 0M185 105q7 6 13 0" stroke="#684b67" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M112 120q-7 8-14 0M185 120q7 8 14 0" stroke="#a45e79" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M135 62q-15-25 8-28q14-2 7 13q22-16 24 3q2 17-25 19Z" fill="#f4e6ff"/>
+<path d="M95 235Q150 252 205 235" stroke="#e7d8ff" stroke-width="2" fill="none"/>
+<text x="150" y="277" text-anchor="middle" font-family="Georgia" font-size="13" fill="#fff">a day of getting closer</text>
+</svg>`;
+
+const birthdayPicture = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+<defs>
+<linearGradient id="bg" x2="0" y2="1">
+<stop stop-color="#49315f"/>
+<stop offset="1" stop-color="#bba0e6"/>
+</linearGradient>
+</defs>
+<rect width="300" height="300" fill="url(#bg)"/>
+<g fill="#fff">
+<circle cx="36" cy="45" r="3"/>
+<circle cx="255" cy="36" r="3"/>
+<circle cx="224" cy="90" r="2"/>
+<circle cx="62" cy="110" r="2"/>
+</g>
+<path d="M0 245Q75 220 150 245T300 240V300H0Z" fill="#8063a3"/>
+<rect x="57" y="150" width="82" height="80" rx="5" fill="#e7d4ff"/>
+<rect x="48" y="140" width="100" height="20" rx="4" fill="#f8eaff"/>
+<path d="M98 140V230" stroke="#a27ac9" stroke-width="12"/>
+<path d="M98 143Q60 130 70 111Q90 98 98 140Q107 96 128 111Q136 131 98 143Z" fill="#d4b5f6"/>
+<rect x="157" y="178" width="91" height="52" rx="5" fill="#bfa0e8"/>
+<rect x="150" y="168" width="105" height="17" rx="4" fill="#f5e7ff"/>
+<path d="M202 168V230" stroke="#805ca6" stroke-width="10"/>
+<path d="M202 170Q170 157 180 142Q197 132 202 168Q212 130 231 145Q238 162 202 170Z" fill="#e8d4ff"/>
+<path d="M145 119V91M135 99L145 89 155 99" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="150" y="275" text-anchor="middle" font-family="Georgia" font-size="14" fill="#fff">you deserve the world</text>
+</svg>`;
+
+const memories = [
+{
+  label: "Memory one · that rainy night",
+  question: "Put the rainy-night memory back together.",
+  image: svgImage(rainPicture),
+  title: "I'd cherish that night all over again.",
+  text: `I still think about one of the first times we went out together. We got lost, the rain was pouring, and things definitely weren't going the way we might have planned. But somehow, when I look back on it, those inconveniences are exactly what make the memory so special to me.
+
+I would cherish that night forever simply because it was with you, Yanie. Before, getting lost or having plans go wrong could easily ruin my mood, and the smallest inconveniences were enough to make me irritated. But with you, those feelings just seem to fade into the background. Your presence makes the situation feel lighter.
+
+Instead of focusing on what went wrong, I find myself being grateful that I'm there with you. Even the rain felt like just another part of a memory I get to keep. You have this way of making imperfect moments feel beautiful, and I hope we get to look back on that night years from now and smile about how we somehow turned getting lost in the rain into something worth remembering.`
+},
+{
+  label: "Memory two · the day we opened up",
+  question: "Put the day we talked for hours back together.",
+  image: svgImage(talkingPicture),
+  title: "Thank you for making it feel safe to open up.",
+  text: `That day meant a lot to me because it was the first time we got to spend the whole day together, and it felt like we got to know each other on a much deeper level. We weren't just passing time or talking about random things. We were sharing parts of ourselves, our thoughts, our experiences, and the things that made us who we are.
+
+What I loved most was how naturally everything came out. Even the things I'm usually sensitive about, the things I overthink, or the things I get scared to tell people somehow found their way out of my mouth. I didn't feel like I had to hide those parts of myself or find the perfect words before sharing them. You made me feel comfortable enough to just be honest.
+
+That kind of comfort is rare, and I don't take it for granted. I'm grateful that you listened and let me get to know you, too. That day reminded me that closeness isn't only about how much time you spend with someone, but how safe you feel being your real self around them.`
+},
+{
+  label: "Memory three · the day before your birthday",
+  question: "Put this little birthday scene back together.",
+  image: svgImage(birthdayPicture),
+  title: "I wanted you to feel as special as you are to me.",
+  text: `The day before your birthday, all I could think about was how much I wanted to give you the world. I wanted to give you anything your heart wished for and everything you deserved, because you deserve to feel loved, appreciated, and celebrated in ways that make you genuinely happy.
+
+I know I can't magically give you every single thing you want, but I wanted to make that day feel special in whatever ways I could. I wanted you to feel how important you are, not just through gifts or grand gestures, but through the little details, the effort, and the thought behind everything.
+
+I wanted to see you happy and know that, even in a small way, I helped make your day brighter. You deserve kindness that doesn't have to be asked for, affection that feels reassuring, and people who make an effort to remind you that you matter. I hope I can keep doing that for you, not only on your birthday, but on ordinary days, too. You don't need a special occasion to deserve that kind of care.`
+}
+];
+
+let current = 0;
+let tiles = [];
+let selected = null;
+
+function show(id) {
+  ["welcome", "puzzle", "memory", "ending"].forEach(name => {
+    document.getElementById(name).classList.toggle("hidden", name !== id);
+  });
+}
+
+function start() {
+  current = 0;
+  loadPuzzle();
+  show("puzzle");
+}
+
+function loadPuzzle() {
+  const memory = memories[current];
+
+  document.getElementById("label").textContent = memory.label;
+  document.getElementById("question").textContent = memory.question;
+
+  [0, 1, 2].forEach(i => {
+    document.getElementById("d" + i)
+      .classList.toggle("active", i <= current);
+  });
+
+  shuffleBoard();
+}
+
+function shuffleBoard() {
+  tiles = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+
+  do {
+    for (let i = tiles.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+    }
+  } while (tiles.every((v, i) => v === i));
+
+  selected = null;
+  renderBoard();
+
+  document.getElementById("feedback").textContent =
+    "Tap two pieces to swap them, or drag and drop. ♡";
+}
+
+function renderBoard() {
+  const board = document.getElementById("board");
+  board.innerHTML = "";
+
+  tiles.forEach((tileId, slotIndex) => {
+    const slot = document.createElement("div");
+    slot.className = "slot" +
+      (selected === slotIndex ? " selected" : "");
+
+    slot.addEventListener("click", () => tapSlot(slotIndex));
+
+    slot.addEventListener("dragover", event => {
+      event.preventDefault();
+    });
+
+    slot.addEventListener("drop", event => {
+      event.preventDefault();
+      const from = Number(event.dataTransfer.getData("text/plain"));
+      swap(from, slotIndex);
+    });
+
+    const tile = document.createElement("div");
+    tile.className = "tile";
+    tile.draggable = true;
+
+    tile.style.backgroundImage = memories[current].image;
+    tile.style.backgroundSize = "300% 300%";
+    tile.style.backgroundPosition =
+      (tileId % 3 * 50) + "% " +
+      (Math.floor(tileId / 3) * 50) + "%";
+
+    tile.addEventListener("dragstart", event => {
+      event.dataTransfer.setData("text/plain", slotIndex);
+    });
+
+    tile.addEventListener("click", event => {
+      event.stopPropagation();
+      tapSlot(slotIndex);
+    });
+
+    slot.appendChild(tile);
+    board.appendChild(slot);
+  });
+}
+
+function tapSlot(index) {
+  if (selected === null) {
+    selected = index;
+    renderBoard();
+
+    document.getElementById("feedback").textContent =
+      "Now choose the piece to swap it with.";
+    return;
+  }
+
+  if (selected === index) {
+    selected = null;
+    renderBoard();
+    return;
+  }
+
+  swap(selected, index);
+}
+
+function swap(a, b) {
+  if (a === b) return;
+
+  [tiles[a], tiles[b]] = [tiles[b], tiles[a]];
+  selected = null;
+  renderBoard();
+
+  if (tiles.every((value, index) => value === index)) {
+    document.getElementById("feedback").textContent =
+      "You did it! Every piece is in place. ♡";
+  } else {
+    document.getElementById("feedback").textContent =
+      "Nice! Keep putting the picture together.";
+  }
+}
+
+function checkBoard() {
+  if (tiles.every((value, index) => value === index)) {
+    const memory = memories[current];
+
+    document.getElementById("memoryLabel").textContent =
+      memory.label;
+    document.getElementById("memoryTitle").textContent =
+      memory.title;
+    document.getElementById("memoryText").innerText =
+      memory.text;
+
+    show("memory");
+  } else {
+    document.getElementById("feedback").textContent =
+      "Not quite yet. Keep moving the pieces until the picture is complete. ♡";
+  }
+}
+
+function nextMemory() {
+  current++;
+
+  if (current < memories.length) {
+    loadPuzzle();
+    show("puzzle");
+  } else {
+    show("ending");
+  }
+}
+</script>
+
+</body>
+</html>
